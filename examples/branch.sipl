@@ -1,0 +1,9 @@
+begin
+    if X > Y then
+        M := X
+    else
+        if Y > 0 then
+            M := Y
+        else
+            skip
+end

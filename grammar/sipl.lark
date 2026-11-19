@@ -1,0 +1,47 @@
+// Формальна граматика мови SIPL
+
+start: program
+
+program: "begin" stmt_list "end"
+
+// Послідовне виконання S1 ; S2
+?stmt_list: stmt
+          | stmt_list ";" stmt -> seq_stmt
+
+?stmt: IDENT ":=" aexp -> assign_stmt
+     | "if" bexp "then" stmt "else" stmt -> if_stmt
+     | "while" bexp "do" stmt -> while_stmt
+     | "begin" stmt_list "end" -> block_stmt
+     | "skip" -> skip_stmt
+
+// Арифметичні вирази
+?aexp: aexp "+" term -> add_expr
+     | aexp "-" term -> sub_expr
+     | term
+
+?term: term "*" factor -> mul_expr
+     | factor
+
+?factor: NUMBER -> num_expr
+       | IDENT -> var_expr
+       | "(" aexp ")" -> paren_aexp
+
+// Булеві вирази
+?bexp: bexp OR_OP bterm -> or_expr
+     | bterm
+
+?bterm: NOT_OP bterm -> not_expr
+      | aexp "=" aexp -> eq_expr
+      | aexp ">" aexp -> gt_expr
+      | "(" bexp ")" -> paren_bexp
+
+OR_OP: "∨" | "or" | "|"
+NOT_OP: "¬" | "not" | "!" | "~"
+
+IDENT: /[a-zA-Z_][a-zA-Z0-9_]*/
+NUMBER: /-?\d+/
+
+COMMENT: /\/\/[^\n]*/ | /#[^\n]*/
+%import common.WS
+%ignore WS
+%ignore COMMENT
